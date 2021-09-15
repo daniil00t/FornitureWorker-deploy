@@ -608,6 +608,12 @@ const homeCallback = (req: express.Request, res: express.Response) => {
 	res.sendFile(path.join(__dirname, "../", "client", "index.html"))
 }
 
+const notFoundCallback = (req: express.Request, res: express.Response) => {
+	res.send("<h1>Page not found</h1>")
+}
+
+
+
 
 
 export const routes: IRoute[] = [
@@ -715,6 +721,13 @@ export const routes: IRoute[] = [
 	},
 	{
 		path: "/",
+		name: "Client App",
+		method: "GET",
+		isPrivate: false,
+		cb: homeCallback
+	},
+	{
+		path: "*",
 		name: "Client App",
 		method: "GET",
 		isPrivate: false,
