@@ -29,7 +29,8 @@
     "express": "^4.17.1",
     "js-file-download": "^0.4.12",
     "mysql2": "^2.3.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "ts-transformer-keys": "^0.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

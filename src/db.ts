@@ -1,11 +1,18 @@
 import mysql from "mysql2"
-import 'reflect-metadata'
+import { IUser } from "./user.db"
 
-interface IEditing{
+interface IPayloadAction{
 	id: number,
-	col: string,
-	value: string
+	col?: string,
+	value?: string,
+	ids?: number[]
 }
+
+interface IAction{
+	type: "CHANGE" | "NEW_ROW" | "DELETE_ROW",
+	payload: IPayloadAction
+}
+
 
 export class DB{
 
@@ -16,6 +23,7 @@ export class DB{
 		this.table = table
 		this.connection = connection
 	}
+
 
 	// GET
 	public getAll(cb: (res: any[]) => void, year?: number){
@@ -38,6 +46,7 @@ export class DB{
 			cb(Number(res[0][column]))
 		})
 	}
+
 	public findRowByCol(col: string, value: string, cb: (res: any[]) => void){
 		this.connection.query(`SELECT * FROM ${this.table} WHERE ${col} = "${value}"`, (err: Error, res: any[]) => {
 			if(err) console.error(err)
@@ -76,7 +85,8 @@ export class DB{
 			else cb(res)
 		})
 	}
-	// UPDATE
+
+
 	public update(setCol: string, setValue: string, id: number){
 		const callback = (err: Error, res: any[]) => {
 			if(err) console.error(err)
@@ -89,9 +99,40 @@ export class DB{
 			
 	}
 
-	public save(data: IEditing[]){
-		data.map((change: IEditing) => {
-			this.update(change.col, change.value, change.id)
+	public save(data: IAction[]): Promise<any>{
+		let actionsLen = data.length
+		return new Promise((resolve, reject) => {
+			data.map((action: IAction) => {
+				try{
+					switch(action.type){
+						case "NEW_ROW":
+							const id = action.payload.id
+							const changesWithId = data.filter(
+								(action: IAction) => action.type === "CHANGE" && action.payload.id === id
+							)
+							break
+		
+						case "CHANGE":
+							this.update(action.payload.col!, action.payload.value!, action.payload.id)
+							actionsLen--
+							break
+						case "DELETE_ROW":
+							action.payload.ids!.map(id => {
+								this.deleteById(id)
+							})
+							
+							actionsLen--
+							break
+						default:
+							console.log("Undefined case")	
+					}
+				}
+				catch(err){
+					reject(err)
+				}
+				if(actionsLen == 0) resolve({ error: false })
+			})
+			resolve({ error: false })
 		})
 	}
 

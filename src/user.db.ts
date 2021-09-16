@@ -14,7 +14,7 @@ enum ERole {
 	NON = 999
 }
 
-interface IUser{
+export interface IUser{
 	id?: number,
 	login: string,
 	jwt: string,
@@ -25,11 +25,6 @@ interface IUser{
 	active?: number
 }
 
-interface IEditing{
-	id: number,
-	col: string,
-	value: string
-}
 
 class Users extends DB{
 	private readonly privateKey: string
@@ -49,11 +44,6 @@ class Users extends DB{
 		this.connection.query(`insert into ${this.table} (id, jwt, login, name, date_created, role, description, active) values (null, "${user.jwt}", "${user.login}", "${user.name}", "${user.date_created}", ${user.role}, "${user.description}", 0)`, (err: Error, res) => {
 			if(err) console.error(err)
 			else console.log("[DB][INFO] Insert data to users' table successed!")
-		})
-	}
-	public save(data: IEditing[]){
-		data.map((change: IEditing) => {
-			this.update(change.col, change.value, change.id)
 		})
 	}
 }

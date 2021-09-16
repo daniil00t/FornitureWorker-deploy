@@ -5,7 +5,6 @@ import mysql from "mysql2"
 import * as env from "dotenv"
 import createReport from 'docx-templates';
 
-
 env.config({ path: path.join(__dirname, "..", ".env") })
 
 import Users from "./user.db"
@@ -248,6 +247,7 @@ const saveControlCallback = (req: express.Request, res: express.Response) => {
 	res.json({ error: false })
 	
 }
+
 // -----------------------------------------------------------------------------
 // -------------------------------Invoices--------------------------------------
 // -----------------------------------------------------------------------------
@@ -601,15 +601,24 @@ const authCallback = (req: express.Request, res: express.Response) => {
 const saveUsersCallback = (req: express.Request, res: express.Response) => {
 	const data = req.body
 	userInstance.save(data.data)
-	res.json({ error: false })
+		.then(d => !d.error && res.json({ error: false }))
+		.catch(err => res.json({ error: true, opt: err }))
+	
+}
+
+const getColorsCallback = (req: express.Request, res: express.Response) => {
+	res.json({
+		error: false,
+		data: [
+			{ id: 1, color: "венге-1" },
+			{ id: 2, color: "венге-2" },
+			{ id: 3, color: "венге-3" },
+		]
+	})
 }
 
 const homeCallback = (req: express.Request, res: express.Response) => {
 	res.sendFile(path.join(__dirname, "../", "client", "index.html"))
-}
-
-const notFoundCallback = (req: express.Request, res: express.Response) => {
-	res.send("<h1>Page not found</h1>")
 }
 
 
@@ -718,6 +727,13 @@ export const routes: IRoute[] = [
 		method: "GET",
 		isPrivate: false,
 		cb: (req: express.Request, res: express.Response) => authMiddleware(req, res, allUsersCallback, EURole.ADMIN)
+	},
+	{
+		path: "/get_colors",
+		name: "All Colors",
+		method: "GET",
+		isPrivate: false,
+		cb: (req: express.Request, res: express.Response) => authMiddleware(req, res, getColorsCallback, EURole.EDITOR)
 	},
 	{
 		path: "/",
