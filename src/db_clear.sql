@@ -17,8 +17,8 @@ CREATE table users (
 
 -- Testing data for users' table
 
-insert into users (id, jwt, login, name, date_created, role, description, active) 
-values(NULL, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImlhdCI6MTYyOTY0NDIwN30.ABUcGSsB1zqxBOKUlcTY4C5_JLEmtnht6dCLfZGM4oE", "admin", "Данилут", "2021-08-16", 0, "Hello!", 1);
+-- insert into users (id, jwt, login, name, date_created, role, description, active) 
+-- values(NULL, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImlhdCI6MTYyOTY0NDIwN30.ABUcGSsB1zqxBOKUlcTY4C5_JLEmtnht6dCLfZGM4oE", "admin", "Данилут", "2021-08-16", 0, "Hello!", 1);
 
 
 create table production_order (
@@ -119,4 +119,15 @@ create table forming_number_order(
 	week int,
 	count int,
 	year int
+);
+
+
+create table colors(
+	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	color varchar(100)
+);
+
+create table materials(
+	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	material varchar(100)
 );

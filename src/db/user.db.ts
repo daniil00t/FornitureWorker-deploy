@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { DB } from "./db"
+import DB from "../db"
 import path from "path"
 import { readFileSync } from "fs"
 import mysql from "mysql2"
@@ -28,9 +28,9 @@ export interface IUser{
 
 class Users extends DB{
 	private readonly privateKey: string
-	constructor(connection: mysql.Connection){
-		super("users", connection)
-		this.privateKey = readFileSync(path.join(__dirname, "../private.key")).toString()
+	constructor(){
+		super("users")
+		this.privateKey = readFileSync(path.join(__dirname, "../", "../", "private.key")).toString()
 	}
 	public generateToken(login: string, password: string){
 		return jwt.sign({ login: login, password: password }, this.privateKey, { algorithm: 'HS256' })

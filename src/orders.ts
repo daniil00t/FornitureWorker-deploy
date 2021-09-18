@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 
-import { FillfulmentControlOrder, CounterWeek } from "./orders.db"
+import { FillfulmentControlOrder, CounterWeek } from "./db/orders.db"
 
 
 export class OrderCounter {

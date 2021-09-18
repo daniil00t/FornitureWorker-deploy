@@ -1,4 +1,4 @@
-import { DB } from "./db"
+import DB from "../db"
 import mysql from "mysql2"
 import 'reflect-metadata'
 
@@ -50,8 +50,8 @@ interface IEditing{
 
 
 export class Invoices extends DB {
-	constructor(connection: mysql.Connection){
-		super("invoices", connection)
+	constructor(){
+		super("invoices")
 	}
 
 
@@ -66,8 +66,8 @@ export class Invoices extends DB {
 }
 
 export class InvoicesOrders extends DB {
-	constructor(connection: mysql.Connection){
-		super("invoice_orders", connection)
+	constructor(){
+		super("invoice_orders")
 	}
 
 

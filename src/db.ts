@@ -1,5 +1,11 @@
 import mysql from "mysql2"
-import { IUser } from "./user.db"
+import * as env from "dotenv"
+import path from "path"
+
+import Settings, { IColor, IMaterial, Colors } from "./db/settings.db"
+
+
+env.config({ path: path.join(__dirname, "..", ".env") })
 
 interface IPayloadAction{
 	id: number,
@@ -14,12 +20,20 @@ interface IAction{
 }
 
 
-export class DB{
+export const connection = mysql.createConnection({
+	multipleStatements: true,
+	host: process.env.DB_HOST,
+	user: process.env.DB_USER,
+	database: process.env.DB_NAME,
+	password: process.env.DB_PASSWORD
+})
 
-	protected readonly connection: mysql.Connection
+export default class DB{
+
+	public connection: mysql.Connection
 	public table: string
 
-	constructor(table: string, connection: mysql.Connection){
+	constructor(table: string){
 		this.table = table
 		this.connection = connection
 	}
@@ -28,13 +42,11 @@ export class DB{
 	// GET
 	public getAll(cb: (res: any[]) => void, year?: number){
 		let query = ""
-		if(Boolean(year))
+		if(year !== undefined)
 			query = `SELECT * FROM ${this.table} where date_created >= "${year}-01-01"`
-
 		else
 			query = `SELECT * FROM ${this.table}`
 
-		
 		this.connection.query(query, (err: Error, res: any[]) => {
 			if(err) console.error(err)
 			else cb(res)
@@ -99,6 +111,8 @@ export class DB{
 			
 	}
 
+	public add(instance: any){}
+
 	public save(data: IAction[]): Promise<any>{
 		let actionsLen = data.length
 		return new Promise((resolve, reject) => {
@@ -107,9 +121,34 @@ export class DB{
 					switch(action.type){
 						case "NEW_ROW":
 							const id = action.payload.id
-							const changesWithId = data.filter(
-								(action: IAction) => action.type === "CHANGE" && action.payload.id === id
-							)
+
+							const changes = data
+								.filter((action: IAction) => 
+									action.type === "CHANGE" &&
+									action.payload.id === id)
+								.reduce((prev: object, curr: IAction) => { return {...prev, [curr.payload.col!]: curr.payload.value} }, {})
+							data = data.filter((action: IAction) => action.payload.id != id)
+
+							
+							switch(this.table){
+								case "colors":
+									var emptyColors: IColor = {
+										id: null,
+										color: ""
+									}
+									const color = { ...emptyColors, ...changes }
+									this.connection.query(`insert into colors (color) values ("${color.color}")`)
+									break
+								case "materials":
+									var emptyMaterials: IMaterial = {
+										id: null,
+										material: ""
+									}
+									const material = { ...emptyMaterials, ...changes }
+
+									this.connection.query(`insert into materials (material) values ("${material.material}")`)
+									break
+							}
 							break
 		
 						case "CHANGE":
