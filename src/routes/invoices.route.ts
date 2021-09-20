@@ -181,7 +181,7 @@ export default class ROUTE__Invoices{
 			delpr = "CHANGE/delivery_price",
 			asspr = "CHANGE/assembly_price",
 			entpr = "CHANGE/entering_price",
-			assAndEntpr = "CHANGE/eassemblyAndEntering_price",
+			assAndEntpr = "CHANGE/assemblyAndEntering_price",
 		}
 	
 		console.log(req.body)
