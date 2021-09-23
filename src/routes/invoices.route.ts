@@ -6,16 +6,22 @@ import createReport from 'docx-templates'
 const DocxMerger = require("docx-merger")
 
 import { Invoices, InvoicesOrders, IInvoiceOrders } from "../db/invoices.db"
+import { ProductionOrders, FillfulmentControlOrder } from "../db/orders.db"
+import { deflate } from "zlib"
 
 
 
 export default class ROUTE__Invoices{
 	private invoicesInstance: Invoices
 	private invoicesOrdersInstance: InvoicesOrders
+	private prodInstance: ProductionOrders
+	private controlInstance: FillfulmentControlOrder
 
 	constructor(){
 		this.invoicesInstance = new Invoices()
 		this.invoicesOrdersInstance = new InvoicesOrders()
+		this.prodInstance = new ProductionOrders()
+		this.controlInstance = new FillfulmentControlOrder()
 	}
 
 	public allInvoicesCallback = (req: express.Request, res: express.Response) => {
@@ -44,6 +50,7 @@ export default class ROUTE__Invoices{
 				const data = rows[0]
 				this.invoicesInstance.add({
 					id_fc: data.id_fc,
+					hash: '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
 					week: data.week,
 					site_name: data.site_name,
 					price: data.price,
@@ -72,6 +79,7 @@ export default class ROUTE__Invoices{
 							this.invoicesOrdersInstance.add({
 								name: order.name,
 								id_fc: data.id_fc,
+								hash: order.hash,
 								count: order.count,
 								week: data.week,
 								material: order.material,
@@ -188,6 +196,7 @@ export default class ROUTE__Invoices{
 	
 		new Promise((resolve, reject) => {
 			req.body.data.length !== 0 && req.body.data.map((action: IAction, index: number) => {
+				console.log(action)
 				try{
 					switch(action.type){
 						case CHANGE_TYPE.NEW_ROW:
@@ -221,7 +230,26 @@ export default class ROUTE__Invoices{
 							})
 							break
 						case CHANGE_TYPE.CHANGE:
-							this.invoicesOrdersInstance.update(action.payload.col, action.payload.value, action.payload.id)
+							this.invoicesOrdersInstance.update(action.payload.col, action.payload.value, action.payload.id, (err: Error, res: any[]) => {
+								if(!req.body.deliver_back){
+									// exeption
+									switch(action.payload.col){
+										case "allPrice":
+											console.log("-> allPrice")
+											break
+										case "priceAllControl":
+											// id -> id_fc
+											console.log("-> priceAllControl")
+											this.controlInstance.updateByAny("price", action.payload.value, "id_fc", action.payload.id)
+											break
+										default:
+											console.log(action.payload.col)
+											this.invoicesOrdersInstance.findRowByCol("id", ""+action.payload.id, (dataRes) => {
+												this.prodInstance.updateByHASH(action.payload.col, action.payload.value, dataRes[0].hash)
+											})
+									}
+								}
+							})
 							break
 						case CHANGE_TYPE.del:
 							this.invoicesInstance.update("delivery", action.payload === "Да"? "1": "0", req.body.id); break

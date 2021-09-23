@@ -25,10 +25,14 @@ export default class ROUTE__Orders{
 
 	public newOrderCallback = (req: express.Request, res: express.Response) => {
 		// Adding to control
+		const hashProd = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
+		const hashControl = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
+
 		const data: any = req.body
 		this.controlInstance.add({
 			id: data.additional.id,
 			id_fc: data.additional.id,
+			hash: hashControl,
 			week: data.additional.week,
 			site_name: data.additional.siteName,
 			price: data.orders.reduce((prev: number, cur: any) => { return prev + cur.allPrice }, 0),
@@ -54,6 +58,7 @@ export default class ROUTE__Orders{
 		this.invoicesInstance.add({
 			id: data.additional.id,
 			id_fc: data.additional.id,
+			hash: hashControl,
 			week: data.additional.week,
 			site_name: data.additional.siteName,
 			price: data.orders.reduce((prev: number, cur: any) => { return prev + cur.allPrice }, 0),
@@ -78,8 +83,9 @@ export default class ROUTE__Orders{
 		// Adding to prod
 		req.body.orders.map((order: any) => {
 			this.prodInstance.add({
-				name: order.name,
 				id_fc: data.additional.id,
+				hash: hashProd,
+				name: order.name,
 				count: order.count,
 				week: data.additional.week,
 				material: order.material,
@@ -90,8 +96,9 @@ export default class ROUTE__Orders{
 			})
 			this.invoicesInstance.getLastRowByCol("id", (idInvoice) => {
 				this.invoicesOrdersInstance.add({
-					name: order.name,
 					id_fc: data.additional.id,
+					hash: hashProd,
+					name: order.name,
 					count: order.count,
 					week: data.additional.week,
 					material: order.material,
@@ -142,15 +149,24 @@ export default class ROUTE__Orders{
 	public saveProdCallback = (req: express.Request, res: express.Response) => {
 		const data = req.body
 		console.log(data)
-		this.prodInstance.save(data.data)
+		this.prodInstance.save(data.data, true, (action, hash) => {
+			this.invoicesOrdersInstance.updateByHASH(action.payload.col!, action.payload.value!, hash, (err, res) => {
+				console.log(err, res)
+			})
+		})
 		res.json({ error: false })
 	}
 	
 	public saveControlCallback = (req: express.Request, res: express.Response) => {
 		const data = req.body
 		console.log(data)
-		this.controlInstance.save(data.data)
+		this.controlInstance.save(data.data, true, (action, hash) => {
+			this.invoicesInstance.updateByHASH(action.payload.col!, action.payload.value!, hash, (err, res) => {
+				console.log(err, res)
+			})
+		})
+		// this.invoicesInstance.save(data.data)
+		// this.invoicesOrdersInstance.save(data.data)
 		res.json({ error: false })
-		
 	}
 }

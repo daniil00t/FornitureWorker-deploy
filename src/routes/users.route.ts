@@ -154,7 +154,7 @@ export default class ROUTE__Users{
 
 	public saveUsersCallback = (req: express.Request, res: express.Response) => {
 		const data = req.body
-		this.userInstance.save(data.data)
+		this.userInstance.save(data.data, false)
 			.then(d => !d.error && res.json({ error: false }))
 			.catch(err => res.json({ error: true, opt: err }))
 		

@@ -16,7 +16,7 @@ CREATE table users (
 
 
 -- Testing data for users' table
-
+-- UNIQUE CODE ID: '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
 -- insert into users (id, jwt, login, name, date_created, role, description, active) 
 -- values(NULL, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImlhdCI6MTYyOTY0NDIwN30.ABUcGSsB1zqxBOKUlcTY4C5_JLEmtnht6dCLfZGM4oE", "admin", "Данилут", "2021-08-16", 0, "Hello!", 1);
 
@@ -24,6 +24,7 @@ CREATE table users (
 create table production_order (
 	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	id_fc int NOT NULL,
+	hash varchar(255) NOT NULL,
 	name varchar(255),
 	count int NOT NULL,
 	week int NOT NULL,
@@ -41,6 +42,7 @@ create table production_order (
 create table fillfulment_control_order (
 	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	id_fc int not null,
+	hash varchar(255) NOT NULL,
 	week int not null,
 	site_name varchar(255),
 	date_order varchar(255),
@@ -72,6 +74,7 @@ create table fillfulment_control_order (
 create table invoices (
 	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	id_fc int not null,
+	hash varchar(255) NOT NULL,
 	week int not null,
 	site_name varchar(255),
 	date_order varchar(255),
@@ -103,6 +106,7 @@ create table invoice_orders (
 	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	id_fc int NOT NULL,
 	id_iv int NOT NULL,
+	hash varchar(255) NOT NULL,
 	name varchar(255),
 	count int NOT NULL,
 	week int NOT NULL,

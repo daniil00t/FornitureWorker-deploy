@@ -3,6 +3,7 @@ import * as env from "dotenv"
 import path from "path"
 
 import Settings, { IColor, IMaterial, Colors } from "./db/settings.db"
+import e from "express"
 
 
 env.config({ path: path.join(__dirname, "..", ".env") })
@@ -99,21 +100,54 @@ export default class DB{
 	}
 
 
-	public update(setCol: string, setValue: string, id: number){
-		const callback = (err: Error, res: any[]) => {
+	public update(setCol: string, setValue: string, id: number, callback?:  (err: Error, res: any[]) => void){
+		const _callback = (err: Error, res: any[]) => {
 			if(err) console.error(err)
 		}
 
 		if(!!Number(setValue))
-			this.connection.query(`UPDATE ${this.table} SET ${setCol} = ${setValue} WHERE id = ${id}`, callback)
+			this.connection.query(
+				`UPDATE ${this.table} SET ${setCol} = ${setValue} WHERE id = ${id}`,
+				callback !== undefined? callback!: _callback
+			)
 		else
-			this.connection.query(`UPDATE ${this.table} SET ${setCol} = "${setValue}" WHERE id = ${id}`, callback)
-			
+			this.connection.query(
+				`UPDATE ${this.table} SET ${setCol} = "${setValue}" WHERE id = ${id}`, 
+				callback !== undefined? callback!: _callback
+			)
 	}
 
-	public add(instance: any){}
+	public updateByHASH(setCol: string, setValue: string, hash: string, callback?:  (err: Error, res: any[]) => void){
+		const _callback = (err: Error, res: any[]) => {
+			if(err) console.error(err)
+		}
 
-	public save(data: IAction[]): Promise<any>{
+		if(!!Number(setValue))
+			this.connection.query(
+				`UPDATE ${this.table} SET ${setCol} = ${setValue} WHERE hash = "${hash}"`,
+				callback !== undefined? callback!: _callback
+			)
+		else
+			this.connection.query(
+				`UPDATE ${this.table} SET ${setCol} = "${setValue}" WHERE hash = "${hash}"`, 
+				callback !== undefined? callback!: _callback
+			)
+	}
+
+	public updateByAny(setCol: string, setValue: string, smtCol: string, smtValue: string, callback?:  (err: Error, res: any[]) => void){
+		const _callback = (err: Error, res: any[]) => {
+			if(err) console.error(err)
+		}
+		const query = `UPDATE ${this.table} SET ${setCol} = ${!!Number(setValue) ? setValue: `"${setValue}"`}
+		WHERE ${smtCol} = ${!!Number(smtValue) ? smtValue: `"${smtValue}"`}`
+		
+		console.log(query)
+		this.connection.query(
+			query, callback !== undefined? callback!: _callback
+		)
+	}
+
+	public save(data: IAction[], dep: boolean, callback?: (data: IAction, _hash: string) => void): Promise<any>{
 		let actionsLen = data.length
 		return new Promise((resolve, reject) => {
 			data.map((action: IAction) => {
@@ -128,22 +162,16 @@ export default class DB{
 									action.payload.id === id)
 								.reduce((prev: object, curr: IAction) => { return {...prev, [curr.payload.col!]: curr.payload.value} }, {})
 							data = data.filter((action: IAction) => action.payload.id != id)
-
+							actionsLen = data.length - 1
 							
 							switch(this.table){
 								case "colors":
-									var emptyColors: IColor = {
-										id: null,
-										color: ""
-									}
+									var emptyColors: IColor = { id: null, color: "" }
 									const color = { ...emptyColors, ...changes }
 									this.connection.query(`insert into colors (color) values ("${color.color}")`)
 									break
 								case "materials":
-									var emptyMaterials: IMaterial = {
-										id: null,
-										material: ""
-									}
+									var emptyMaterials: IMaterial = { id: null, material: "" }
 									const material = { ...emptyMaterials, ...changes }
 
 									this.connection.query(`insert into materials (material) values ("${material.material}")`)
@@ -152,13 +180,21 @@ export default class DB{
 							break
 		
 						case "CHANGE":
-							this.update(action.payload.col!, action.payload.value!, action.payload.id)
-							actionsLen--
+							if(dep){
+								this.update(action.payload.col!, action.payload.value!, action.payload.id, (err: Error, res: any[]) => {
+									this.findRowByCol("id", ""+action.payload.id, (res) => {
+										callback!(action, res[0].hash)
+									})
+								})
+								actionsLen--
+							}
+							else{
+								this.update(action.payload.col!, action.payload.value!, action.payload.id)
+								actionsLen--
+							}
 							break
 						case "DELETE_ROW":
-							action.payload.ids!.map(id => {
-								this.deleteById(id)
-							})
+							action.payload.ids!.map(id => { this.deleteById(id) })
 							
 							actionsLen--
 							break
@@ -178,6 +214,11 @@ export default class DB{
 	// DELETE
 	public deleteById(id: number){
 		this.connection.query(`delete from ${this.table} where id = ${id}`, (err: Error, res) => {
+			if(err) console.error(err)
+		})
+	}
+	public deleteByHASH(hash: string){
+		this.connection.query(`delete from ${this.table} where hash = "${hash}"`, (err: Error, res) => {
 			if(err) console.error(err)
 		})
 	}

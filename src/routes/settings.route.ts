@@ -1,5 +1,5 @@
 import mysql from "mysql2"
-import Settings, { Colors } from "../db/settings.db"
+import Settings, { Colors, Materials} from "../db/settings.db"
 import express from "express"
 import mysqldump from 'mysqldump'
 import * as env from "dotenv"
@@ -12,10 +12,12 @@ env.config({ path: path.join(__dirname, "../", "../", ".env") })
 export default class ROUTE__Settings{
 	private settings: Settings
 	private colors: Colors
+	private materials: Materials
 	private connection: mysql.Connection
 	constructor(){
 		this.settings = new Settings()
 		this.colors = new Colors()
+		this.materials = new Materials()
 		this.connection = this.colors.connection
 	}
 
@@ -29,7 +31,7 @@ export default class ROUTE__Settings{
 
 	public saveColors = (req: express.Request, res: express.Response) => {
 		console.log(req.body.changes)
-		this.colors.save(req.body.changes)
+		this.colors.save(req.body.changes, false)
 			.then((data) => res.json({ error: false }))
 			.catch((err) => res.json({ error: true }))
 	}
@@ -42,7 +44,7 @@ export default class ROUTE__Settings{
 		this.settings.materials.getAll((materials) => res.json({ data: materials, error: false }))
 	}
 	public saveMaterials = (req: express.Request, res: express.Response) => {
-		this.settings.materials.save(req.body.changes)
+		this.materials.save(req.body.changes, false)
 			.then((data) => res.json({ error: false }))
 			.catch((err) => res.json({ error: true }))
 	}
