@@ -3,7 +3,7 @@ import mysql from "mysql2"
 import 'reflect-metadata'
 
 
-interface IProductionOrders{
+export interface IProductionOrders{
 	id?: number,
 	id_fc: number,
 	hash: string,

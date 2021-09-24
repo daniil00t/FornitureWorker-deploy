@@ -6,7 +6,7 @@ import createReport from 'docx-templates'
 const DocxMerger = require("docx-merger")
 
 import { Invoices, InvoicesOrders, IInvoiceOrders } from "../db/invoices.db"
-import { ProductionOrders, FillfulmentControlOrder } from "../db/orders.db"
+import { ProductionOrders, FillfulmentControlOrder, IProductionOrders } from "../db/orders.db"
 import { deflate } from "zlib"
 
 
@@ -149,8 +149,10 @@ export default class ROUTE__Invoices{
 								assembly: !!invoice.assembly? `Да (${invoice.assembly_price} руб.)`: "Нет",
 								entering: !!invoice.entering? `Да (${invoice.entering_price} руб.)`: "Нет",
 								assemblyAndEntering: !!invoice.assemblyAndEntering? `Да (${invoice.assemblyAndEntering_price} руб.)`: "Нет",
-								orders: [...prods.reduce((prev, curr) => { return [...prev, { ...curr, units: "шт.", index: index++}] }, [])]
+								orders: [...prods.reduce((prev, curr) => { return [...prev, { ...curr, units: "шт.", index: index++}] }, [])],
+								allPriceInvoice: prods.reduce((prev, curr) => { return prev + curr.allPrice }, 0)
 							}
+							console.log(data)
 							getInvoiceDOCX(data)
 								.then(buffer => buffersDOCX.length === len && resolve(buffersDOCX))
 								.catch(err => console.log(err))
@@ -205,7 +207,7 @@ export default class ROUTE__Invoices{
 									change.type === CHANGE_TYPE.CHANGE &&
 									change.payload.id === action.payload.id)
 								.reduce((prev: object, curr: IAction) => { return {...prev, [curr.payload.col]: curr.payload.value} }, {})
-							console.log("new row actions", changes)	
+							const hash = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
 	
 							let newInvoiceOrder: IInvoiceOrders = {
 								id: action.payload.id,
@@ -218,11 +220,28 @@ export default class ROUTE__Invoices{
 								color: "",
 								price: 0,
 								allPrice: 0,
+								hash: hash,
+								...changes
+							}
+
+							let newProdOrder: IProductionOrders = {
+								id_fc: req.body.id_fc,
+								name: "",
+								count: 0,
+								week: req.body.week,
+								material: "",
+								color: "",
+								price: 0,
+								allPrice: 0,
+								year: 2021,
+								id_added_user: 1,
+								hash,
 								...changes
 							}
 							console.log("new instance actions", newInvoiceOrder)
 							
 							this.invoicesOrdersInstance.add(newInvoiceOrder)
+							!req.body.deliver_back && this.prodInstance.add(newProdOrder)
 							break
 						case CHANGE_TYPE.DELETE_ROW:
 							action.payload.map((id: number) => {
@@ -235,7 +254,8 @@ export default class ROUTE__Invoices{
 									// exeption
 									switch(action.payload.col){
 										case "allPrice":
-											console.log("-> allPrice")
+										case "price":
+											console.log("-> allPrice or price")
 											break
 										case "priceAllControl":
 											// id -> id_fc

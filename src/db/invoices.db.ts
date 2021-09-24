@@ -1,5 +1,4 @@
 import DB from "../db"
-import mysql from "mysql2"
 import 'reflect-metadata'
 
 export interface IInvoiceOrders{
