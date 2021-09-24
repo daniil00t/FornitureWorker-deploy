@@ -7,7 +7,6 @@ const DocxMerger = require("docx-merger")
 
 import { Invoices, InvoicesOrders, IInvoiceOrders } from "../db/invoices.db"
 import { ProductionOrders, FillfulmentControlOrder, IProductionOrders } from "../db/orders.db"
-import { deflate } from "zlib"
 
 
 
@@ -194,8 +193,6 @@ export default class ROUTE__Invoices{
 			assAndEntpr = "CHANGE/assemblyAndEntering_price",
 		}
 	
-		console.log(req.body)
-	
 		new Promise((resolve, reject) => {
 			req.body.data.length !== 0 && req.body.data.map((action: IAction, index: number) => {
 				console.log(action)
@@ -226,19 +223,19 @@ export default class ROUTE__Invoices{
 
 							let newProdOrder: IProductionOrders = {
 								id_fc: req.body.id_fc,
-								name: "",
+								name: "-",
 								count: 0,
 								week: req.body.week,
-								material: "",
-								color: "",
+								material: "-",
+								color: "-",
 								price: 0,
 								allPrice: 0,
 								year: 2021,
 								id_added_user: 1,
+								date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
 								hash,
 								...changes
 							}
-							console.log("new instance actions", newInvoiceOrder)
 							
 							this.invoicesOrdersInstance.add(newInvoiceOrder)
 							!req.body.deliver_back && this.prodInstance.add(newProdOrder)
@@ -255,11 +252,9 @@ export default class ROUTE__Invoices{
 									switch(action.payload.col){
 										case "allPrice":
 										case "price":
-											console.log("-> allPrice or price")
 											break
 										case "priceAllControl":
 											// id -> id_fc
-											console.log("-> priceAllControl")
 											this.controlInstance.updateByAny("price", action.payload.value, "id_fc", action.payload.id)
 											break
 										default:
