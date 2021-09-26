@@ -1,10 +1,12 @@
 import mysql from "mysql2"
-import Settings, { Colors, Materials} from "../db/settings.db"
 import express from "express"
 import mysqldump from 'mysqldump'
 import * as env from "dotenv"
 import path from "path"
 import fs from "fs"
+
+import Settings, { Colors, Materials} from "../db/settings.db"
+import SenderMails from "../senderMails"
 
 env.config({ path: path.join(__dirname, "../", "../", ".env") })
 
@@ -65,7 +67,12 @@ export default class ROUTE__Settings{
 			},
 			// dumpToFile: `./${new Date().toJSON()}.dump.sql`,
 			dumpToFile: path.join(__dirname, "../", "../", "/dumps", fileName),
-	  }).then((data) => res.json({ error: false, fileName }))
+		}).then((data) => {
+			res.json({ error: false, fileName })
+			this.sendMail(fileName)
+				.then(val => console.log(val))
+				.catch(err => console.log(err))
+		})
 	  	.catch(err => {
 
 			  console.log(err)
@@ -95,5 +102,16 @@ export default class ROUTE__Settings{
 				res.json({ data, error: false })
 			}
 		})
+	}
+
+	private sendMail = (filename: string): Promise<any> => {
+		const sender = new SenderMails()
+		return sender.sendMail(
+			"mr.shenyagin.1@gmail.com",
+			"Auto Backup every 3 days",
+			"Hello! It is backup, attachmenting in file below",
+			"",
+			filename
+		)
 	}
 }

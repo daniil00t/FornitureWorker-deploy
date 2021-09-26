@@ -1,6 +1,5 @@
 import express from "express"
 import path from "path"
-import mysql from "mysql2"
 
 
 import ROUTE__Users from "./routes/users.route"
@@ -14,7 +13,7 @@ import ROUTE__Settings from "./routes/settings.route"
 const ROUTES__UserInstance: ROUTE__Users = new ROUTE__Users()
 const ROUTES__InvoicesInstance: ROUTE__Invoices = new ROUTE__Invoices()
 const ROUTES__OrdersInstance: ROUTE__Orders = new ROUTE__Orders()
-const ROUTE__SettingsInstance: ROUTE__Settings = new ROUTE__Settings()
+const ROUTES__SettingsInstance: ROUTE__Settings = new ROUTE__Settings()
 
 
 type expresscb = (req: express.Request, res: express.Response) => void
@@ -158,7 +157,7 @@ export const routes: IRoute[] = [
 		method: "GET",
 		isPrivate: false,
 		cb: (req: express.Request, res: express.Response) => 
-			ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.getColors, EURole.ADMIN)
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.getColors, EURole.ADMIN)
 	},
 	{
 		path: "/save_data/colors",
@@ -166,7 +165,7 @@ export const routes: IRoute[] = [
 		method: "POST",
 		isPrivate: false,
 		cb: (req: express.Request, res: express.Response) => 
-		ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.saveColors, EURole.ADMIN)
+		ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.saveColors, EURole.ADMIN)
 	},
 	{
 		path: "/get_materials",
@@ -174,7 +173,7 @@ export const routes: IRoute[] = [
 		method: "GET",
 		isPrivate: false,
 		cb: (req: express.Request, res: express.Response) => 
-			ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.getMaterials, EURole.EDITOR)
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.getMaterials, EURole.EDITOR)
 	},
 	{
 		path: "/save_data/materials",
@@ -182,7 +181,7 @@ export const routes: IRoute[] = [
 		method: "POST",
 		isPrivate: false,
 		cb: (req: express.Request, res: express.Response) => 
-			ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.saveMaterials, EURole.EDITOR)
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.saveMaterials, EURole.EDITOR)
 	},
 
 	// System Routes
@@ -192,7 +191,7 @@ export const routes: IRoute[] = [
 		method: "POST",
 		isPrivate: true,
 		cb: (req: express.Request, res: express.Response) => 
-			ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.makeBackup, EURole.ADMIN)
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.makeBackup, EURole.ADMIN)
 	},
 	{
 		path: "/get_backups",
@@ -200,7 +199,7 @@ export const routes: IRoute[] = [
 		method: "GET",
 		isPrivate: true,
 		cb: (req: express.Request, res: express.Response) => 
-			ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.getBackups, EURole.ADMIN)
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.getBackups, EURole.ADMIN)
 	},
 	{
 		path: "/to_backup",
@@ -208,7 +207,7 @@ export const routes: IRoute[] = [
 		method: "POST",
 		isPrivate: true,
 		cb: (req: express.Request, res: express.Response) => 
-			ROUTES__UserInstance.authMiddleware(req, res, ROUTE__SettingsInstance.toBackup, EURole.ADMIN)
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__SettingsInstance.toBackup, EURole.ADMIN)
 	},
 
 	// --------------------------------------------------------------------------
