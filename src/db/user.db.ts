@@ -40,10 +40,13 @@ class Users extends DB{
 		return jwt.verify(token, this.privateKey) as Object
 	}
 
-	public add(user: IUser){
+	public add(user: IUser, cb?: (error: Error, res: any) => void){
 		this.connection.query(`insert into ${this.table} (id, jwt, login, name, date_created, role, description, active) values (null, "${user.jwt}", "${user.login}", "${user.name}", "${user.date_created}", ${user.role}, "${user.description}", 0)`, (err: Error, res) => {
-			if(err) console.error(err)
-			else console.log("[DB][INFO] Insert data to users' table successed!")
+			if(cb !== undefined) cb(err, res)
+			else{
+				if(err) console.error(err)
+				else console.log("[DB][INFO] Insert data to users' table successed!")
+			}
 		})
 	}
 }

@@ -151,7 +151,6 @@ export default class ROUTE__Invoices{
 								orders: [...prods.reduce((prev, curr) => { return [...prev, { ...curr, units: "шт.", index: index++}] }, [])],
 								allPriceInvoice: prods.reduce((prev, curr) => { return prev + curr.allPrice }, 0)
 							}
-							console.log(data)
 							getInvoiceDOCX(data)
 								.then(buffer => buffersDOCX.length === len && resolve(buffersDOCX))
 								.catch(err => console.log(err))
@@ -163,6 +162,7 @@ export default class ROUTE__Invoices{
 		
 		
 		getInvoicesDOCX().then(data => {
+			console.log(data)
 			new DocxMerger({}, data)
 				.save('nodebuffer', function (merged: any) {
 					res.end(merged)

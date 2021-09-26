@@ -25,7 +25,7 @@ export default class ROUTE__Orders{
 
 	public newOrderCallback = (req: express.Request, res: express.Response) => {
 		// Adding to control
-		const hashProd = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
+		
 		const hashControl = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
 
 		const data: any = req.body
@@ -82,6 +82,8 @@ export default class ROUTE__Orders{
 		})
 		// Adding to prod
 		req.body.orders.map((order: any) => {
+			const hashProd = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
+			
 			this.prodInstance.add({
 				id_fc: data.additional.id,
 				hash: hashProd,

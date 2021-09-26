@@ -1,6 +1,8 @@
 import mysql from "mysql2"
 import Users from "../db/user.db"
 import express from "express"
+import { rejects } from "assert"
+import { resolve } from "path/posix"
 
 
 enum EURole{
@@ -91,16 +93,28 @@ export default class ROUTE__Users{
 
 	public registrationCallback = (req: express.Request, res: express.Response) => {
 		const data = req.body
-	
-		this.userInstance.add({
-			name: data.name,
-			login: data.login,
-			jwt: this.userInstance.generateToken(data.login, data.password),
-			date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
-			role: +data.role
+
+		new Promise((resolve, reject) => {
+			this.userInstance.findRowByCol("login", data.login, (res) => {
+				if(res.length === 0){
+					this.userInstance.add({
+						name: data.name,
+						login: data.login,
+						jwt: this.userInstance.generateToken(data.login, data.password),
+						date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+						role: +data.role
+					}, (error, res) => {
+						if(error) reject({ error: true })
+						else resolve({ error: false, jwt: this.userInstance.generateToken(data.login, data.password) })
+					})
+				}
+				else{
+					reject({ error: true })
+				}
+			})
 		})
-	
-		res.json({ jwt: this.userInstance.generateToken(data.login, data.password) })
+			.then(response => res.json(response))
+			.catch(error => res.json(error))
 	}
 
 	public loginCallback = (req: express.Request, res: express.Response) => {

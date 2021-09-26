@@ -52,7 +52,7 @@ create table fillfulment_control_order (
 	price float(10, 2),
 	status varchar(255),
 	paid float(10, 2),
-	debt float(10, 2),
+	debt varchar(255),
 	date_created date,
 	year int,
 

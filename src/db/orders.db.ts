@@ -33,7 +33,7 @@ interface IFillfulmentControlOrder{
 	price: number,
 	status?: string,
 	paid?: number,
-	debt?: number,
+	debt?: string,
 	date_created: string,
 	year: number,
 
@@ -79,7 +79,7 @@ export class FillfulmentControlOrder extends DB {
 
 	public add(order: IFillfulmentControlOrder, cb?: (err: Error, result: any) => void){
 		this.connection.query(`insert into ${this.table} (id, id_fc, hash, week, site_name, date_order, date_created, client_phone, client_name, client_address, price, status, paid, debt, year, delivery, assembly, entering, assemblyAndEntering,  delivery_price, assembly_price, entering_price, assemblyAndEntering_price) 
-		values (null, ${order.id_fc}, "${order.hash}", ${order.week}, "${order.site_name}", "${order.date_order}", "${order.date_created}", "${order.client_phone}", "${order.client_name}", "${order.client_address}", ${order.price}, "В работе", 0, 0, ${order.year}, ${order.delivery}, ${order.assembly}, ${order.entering}, ${order.assemblyAndEntering}, ${order.delivery_price}, ${order.assembly_price}, ${order.entering_price}, ${order.assemblyAndEntering_price})`, (err: Error, res: any) => {
+		values (null, ${order.id_fc}, "${order.hash}", ${order.week}, "${order.site_name}", "${order.date_order}", "${order.date_created}", "${order.client_phone}", "${order.client_name}", "${order.client_address}", ${order.price}, "В работе", 0, "0", ${order.year}, ${order.delivery}, ${order.assembly}, ${order.entering}, ${order.assemblyAndEntering}, ${order.delivery_price}, ${order.assembly_price}, ${order.entering_price}, ${order.assemblyAndEntering_price})`, (err: Error, res: any) => {
 			if(err) console.error(err)
 		})
 		return order.hash
