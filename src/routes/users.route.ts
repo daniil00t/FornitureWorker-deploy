@@ -95,15 +95,15 @@ export default class ROUTE__Users{
 		const data = req.body
 
 		new Promise((resolve, reject) => {
-			this.userInstance.findRowByCol("login", data.login, (res) => {
-				if(res.length === 0){
+			this.userInstance.findRowByCol("login", data.login, (response) => {
+				if(response.length === 0){
 					this.userInstance.add({
 						name: data.name,
 						login: data.login,
 						jwt: this.userInstance.generateToken(data.login, data.password),
-						date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+						date_created: new Date().toISOString().slice(0, 19).replace('T', ' '),
 						role: +data.role
-					}, (error, res) => {
+					}, (error, __res) => {
 						if(error) reject({ error: true })
 						else resolve({ error: false, jwt: this.userInstance.generateToken(data.login, data.password) })
 					})
