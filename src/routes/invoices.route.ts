@@ -149,7 +149,12 @@ export default class ROUTE__Invoices{
 								entering: !!invoice.entering? `Да (${invoice.entering_price} руб.)`: "Нет",
 								assemblyAndEntering: !!invoice.assemblyAndEntering? `Да (${invoice.assemblyAndEntering_price} руб.)`: "Нет",
 								orders: [...prods.reduce((prev, curr) => { return [...prev, { ...curr, units: "шт.", index: index++}] }, [])],
-								allPriceInvoice: prods.reduce((prev, curr) => { return prev + curr.allPrice }, 0)
+								allPriceInvoice: 
+									prods.reduce((prev, curr) => { return prev + curr.allPrice }, 0)
+										+ invoice.delivery_price 
+										+ invoice.assembly_price 
+										+ invoice.entering_price 
+										+ invoice.assemblyAndEntering_price
 							}
 							getInvoiceDOCX(data)
 								.then(buffer => buffersDOCX.length === len && resolve(buffersDOCX))

@@ -1,11 +1,9 @@
 import nodemailer from "nodemailer"
 import { readFileSync } from "fs"
 import path from "path"
+import * as env from "dotenv"
 
-interface AccountField{
-	user: string
-	pass: string
-}
+env.config({ path: path.join(__dirname, ".env") })
 
 export default class SenderMails{
 	private transporter: nodemailer.Transporter
@@ -26,19 +24,21 @@ export default class SenderMails{
 		 })
 	}
 
-	sendMail(to: string, sub: string, text: string, html: string, filename: string): Promise<any>{
+	sendMail(sub: string, text: string, html: string, filename: string): Promise<any>{
 		return this.transporter.sendMail({
-			from: '✔ sender.mails.fornitureworker@gmail.com',
-			to,
+			from: `📟 ${process.env.MAIL_USERNAME}`,
+			to: process.env.TO_EMAIL,
 			subject: sub,
 			text,
 			html,
 			attachments: [
 				{
 					filename,
-					content: readFileSync(path.join(__dirname, "dumps", filename))
+					content: readFileSync(path.join(__dirname, "../", "dumps", filename))
 				}
 			]
-		 })
+		})
+			.then(val => console.log(val))
+			.catch(err => console.log(err))
 	}
 }

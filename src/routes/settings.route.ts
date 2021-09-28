@@ -107,8 +107,7 @@ export default class ROUTE__Settings{
 	private sendMail = (filename: string): Promise<any> => {
 		const sender = new SenderMails()
 		return sender.sendMail(
-			"mr.shenyagin.1@gmail.com",
-			"Auto Backup every 3 days",
+			"TEST Backup from fornitureworker",
 			"Hello! It is backup, attachmenting in file below",
 			"",
 			filename
