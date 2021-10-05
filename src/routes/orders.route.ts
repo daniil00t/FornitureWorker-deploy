@@ -35,7 +35,7 @@ export default class ROUTE__Orders{
 			hash: hashControl,
 			week: data.additional.week,
 			site_name: data.additional.siteName,
-			price: data.orders.reduce((prev: number, cur: any) => { return prev + cur.allPrice }, 0),
+			price: data.orders.reduce((prev: number, cur: any) => { return prev + cur.allPrice }, 0) + Number(data.additional.delivery),
 			client_phone: data.client.phone,
 			client_name: data.client.name,
 			client_address: data.client.address,
@@ -51,8 +51,7 @@ export default class ROUTE__Orders{
 			delivery_price: Number(data.additional.delivery_price),
 			assembly_price: Number(data.additional.assembly_price),
 			entering_price: Number(data.additional.entering_price),
-			assemblyAndEntering_price: Number(data.additional.assemblyAndEntering_price),
-	
+			assemblyAndEntering_price: Number(data.additional.assemblyAndEntering_price)
 		})
 	
 		this.invoicesInstance.add({

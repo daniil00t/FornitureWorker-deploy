@@ -1,12 +1,11 @@
 import mysql from "mysql2"
 import express from "express"
-import mysqldump from 'mysqldump'
 import * as env from "dotenv"
 import path from "path"
-import fs from "fs"
 
 import Settings, { Colors, Materials} from "../db/settings.db"
-import SenderMails from "../senderMails"
+
+import Backups from "../Backups"
 
 env.config({ path: path.join(__dirname, "../", "../", ".env") })
 
@@ -15,12 +14,13 @@ export default class ROUTE__Settings{
 	private settings: Settings
 	private colors: Colors
 	private materials: Materials
-	private connection: mysql.Connection
+	public backupsInstance: Backups
+
 	constructor(){
 		this.settings = new Settings()
 		this.colors = new Colors()
 		this.materials = new Materials()
-		this.connection = this.colors.connection
+		this.backupsInstance = new Backups(this.colors.connection)
 	}
 
 	// --------------------------------------------------------------------------
@@ -56,43 +56,20 @@ export default class ROUTE__Settings{
 	// --------------------------------------------------------------------------
 
 	public makeBackup = (req: express.Request, res: express.Response) => {
-		const date = new Date()
-		const fileName = `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}_${date.getHours()}.${date.getMinutes()}.${date.getSeconds()}.dump.sql`
-		mysqldump({
-			connection: {
-				host: process.env.DB_HOST,
-				user: process.env.DB_USER!,
-				database: process.env.DB_NAME!,
-				password: process.env.DB_PASSWORD!
-			},
-			// dumpToFile: `./${new Date().toJSON()}.dump.sql`,
-			dumpToFile: path.join(__dirname, "../", "../", "/dumps", fileName),
-		}).then((data) => {
-			res.json({ error: false, fileName })
-			this.sendMail(fileName)
-				.then(val => console.log(val))
-				.catch(err => console.log(err))
-		})
-	  	.catch(err => {
-
-			  console.log(err)
-			  res.json({ error: true })
-		  }
-		)
+		this.backupsInstance.makeBackup()
+			.then(data => {
+				res.json(data)
+				}
+			)
+			.catch(err => res.json(err))
 	}
 
 	public getBackups = (req: express.Request, res: express.Response) => {
-		res.json({ data: fs.readdirSync(path.join(__dirname, "../", "../", "/dumps")) })
+		res.json({ data: this.backupsInstance.getBackups() })
 	}
 
 	public toBackup = (req: express.Request, res: express.Response) => {
-		const dumpFileName = req.body.fileName
-		const body = fs.readFileSync(path.join(__dirname, "../", "../", "/dumps", dumpFileName)).toString()
-		const queryInit = `DROP DATABASE IF EXISTS ${process.env.DB_NAME!};
-								CREATE DATABASE ${process.env.DB_NAME!};
-								USE ${process.env.DB_NAME!};\n` + body
-
-		this.connection.query(queryInit,(err: Error, data: any[]) => {
+		this.backupsInstance.toBackup(req.body.fileName, (err: Error, data: any[]) => {
 			if(err) {
 				console.log(err)
 				res.json({ error: true, errorMessage: err.message })
@@ -100,17 +77,11 @@ export default class ROUTE__Settings{
 			else {
 				console.log(data)
 				res.json({ data, error: false })
+				
 			}
 		})
+		
 	}
 
-	private sendMail = (filename: string): Promise<any> => {
-		const sender = new SenderMails()
-		return sender.sendMail(
-			"TEST Backup from fornitureworker",
-			"Hello! It is backup, attachmenting in file below",
-			"",
-			filename
-		)
-	}
+
 }

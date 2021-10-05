@@ -15,6 +15,8 @@ const ROUTES__InvoicesInstance: ROUTE__Invoices = new ROUTE__Invoices()
 const ROUTES__OrdersInstance: ROUTE__Orders = new ROUTE__Orders()
 const ROUTES__SettingsInstance: ROUTE__Settings = new ROUTE__Settings()
 
+ROUTES__SettingsInstance.backupsInstance.autoBackup()
+
 
 type expresscb = (req: express.Request, res: express.Response) => void
 
