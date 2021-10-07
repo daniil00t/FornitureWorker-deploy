@@ -151,7 +151,8 @@ export default class ROUTE__Invoices{
 								orders: [...prods.reduce((prev, curr) => { return [...prev, { ...curr, units: "шт.", index: index++ }] }, [])],
 								allPriceInvoice: 
 									prods.reduce((prev, curr) => { return prev + curr.allPrice }, 0)
-										+ (!!invoice.delivery? invoice.delivery_price : 0)
+										+ (!!invoice.delivery? invoice.delivery_price : 0),
+								condDelivery: (!!invoice.delivery? `Доставка: + ${invoice.delivery_price}₽ = ` : "")
 							}
 							getInvoiceDOCX(data)
 								.then(buffer => buffersDOCX.length === len && resolve(buffersDOCX))
