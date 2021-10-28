@@ -29,16 +29,30 @@ export default class ROUTE__Invoices{
 			case "main":
 				Boolean(req.query.year)? 
 					this.invoicesInstance.findRowByCol("year", ""+req.query.year, (data) => {res.json({ data })}):
-					this.invoicesInstance.getAll((_res) => { res.json({data: _res}) })
+					this.invoicesInstance.getAll((_res) => { 
+						res.json({data: _res})
+					 })
 				break
 			case "prods":
-				this.invoicesOrdersInstance.getAll((_res) => { res.json({data: _res}) })
+				this.invoicesOrdersInstance.getAll((_res) => { 
+					res.json({data: _res})
+				 })
 				break
 			default:
 				res.send("No query")
 		}
 	}
 	
+	public deleteInvoices = (req: express.Request, res: express.Response) => {
+		req.body.hashes.map((item: {hash: string, id_fc: number}) => {
+			this.invoicesInstance.deleteByHASH(item.hash)
+			this.prodInstance.deleteBySMT("id_fc", ""+item.id_fc);
+			this.controlInstance.deleteByHASH(item.hash)
+		})
+		
+		res.json({ error: false })
+	}
+
 	public newInovoiceDeliverBackCallback = (req: express.Request, res: express.Response) => {
 		console.log(req.query)
 	

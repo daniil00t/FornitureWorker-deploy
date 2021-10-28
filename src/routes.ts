@@ -146,6 +146,14 @@ export const routes: IRoute[] = [
 			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__InvoicesInstance.allInvoicesCallback, EURole.USER)
 	},
 	{
+		path: "/delete_invoice",
+		name: "Delete invoices",
+		method: "POST",
+		isPrivate: true,
+		cb: (req: express.Request, res: express.Response) => 
+			ROUTES__UserInstance.authMiddleware(req, res, ROUTES__InvoicesInstance.deleteInvoices, EURole.ADMIN)
+	},
+	{
 		path: "/users",
 		name: "All Orders",
 		method: "GET",

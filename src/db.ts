@@ -50,7 +50,9 @@ export default class DB{
 
 		this.connection.query(query, (err: Error, res: any[]) => {
 			if(err) console.error(err)
-			else cb(res)
+			else {
+				cb(res)
+			}
 		})
 	}
 
@@ -218,8 +220,20 @@ export default class DB{
 		})
 	}
 	public deleteByHASH(hash: string){
+		console.log(`delete from ${this.table} where hash = "${hash}"`)
 		this.connection.query(`delete from ${this.table} where hash = "${hash}"`, (err: Error, res) => {
 			if(err) console.error(err)
+			else console.log(res)
 		})
+	}
+	public deleteBySMT(col: string, value: string){
+		if(!!Number(value))
+			this.connection.query(
+				`delete from ${this.table} where ${col} = ${value}`
+			)
+		else
+			this.connection.query(
+				`delete from ${this.table} where ${col} = "${value}"`
+			)
 	}
 }
