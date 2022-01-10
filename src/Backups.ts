@@ -42,7 +42,7 @@ export default class Backups{
 	public makeBackup(): Promise<any>{
 		return new Promise((resolve, reject) => {
 			const date = new Date()
-			const fileName = `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}_${date.getHours()}.${date.getMinutes()}.${date.getSeconds()}.dump.sql`
+			const fileName = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}_${date.getHours()}.${date.getMinutes()}.${date.getSeconds()}.dump.sql`
 			mysqldump({
 				connection: this.conn,
 				dumpToFile: path.join(__dirname, "../", "/dumps", fileName),

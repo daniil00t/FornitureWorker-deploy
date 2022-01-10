@@ -64,6 +64,7 @@ export class ProductionOrders extends DB {
 		this.connection.query(`insert into ${this.table} (id, id_fc, hash, name, count, week, material, color, year, status, date_created, description, id_added_user) 
 		values (null, ${order.id_fc}, "${order.hash}", "${order.name}", ${order.count}, ${order.week}, "${order.material}",  "${order.color}", ${order.year}, "В работе", "${order.date_created}", "${order.description}", ${order.id_added_user})`, (err: Error, res) => {
 			if(err) console.error(err)
+			else console.log("IProductionOrders is created!", order)
 		})
 		return order.hash
 	}
@@ -80,6 +81,7 @@ export class FillfulmentControlOrder extends DB {
 		this.connection.query(`insert into ${this.table} (id, id_fc, hash, week, site_name, date_order, date_created, client_phone, client_name, client_address, price, status, paid, debt, year, delivery, assembly, entering, assemblyAndEntering,  delivery_price, assembly_price, entering_price, assemblyAndEntering_price) 
 		values (null, ${order.id_fc}, "${order.hash}", ${order.week}, "${order.site_name}", "${order.date_order}", "${order.date_created}", "${order.client_phone}", "${order.client_name}", "${order.client_address}", ${order.price}, "В работе", 0, "0", ${order.year}, ${order.delivery}, ${order.assembly}, ${order.entering}, ${order.assemblyAndEntering}, ${order.delivery_price}, ${order.assembly_price}, ${order.entering_price}, ${order.assemblyAndEntering_price})`, (err: Error, res: any) => {
 			if(err) console.error(err)
+			else console.log("IFillfulmentControlOrder is created!", order)
 		})
 		return order.hash
 	}

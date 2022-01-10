@@ -71,7 +71,7 @@ export default class ROUTE__Invoices{
 					client_name: data.client_name,
 					client_address: data.client_address,
 					date_order: "",
-					date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+					date_created: String(new Date().toISOString().replace('Z','').replace('T', ' ').substr(0,10)),
 					deliver_back: 1,
 					year: data.year,
 			
@@ -249,7 +249,7 @@ export default class ROUTE__Invoices{
 								allPrice: 0,
 								year: 2021,
 								id_added_user: 1,
-								date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+								date_created: String(new Date().toISOString().replace('Z','').replace('T', ' ').substr(0,10)),
 								hash,
 								...changes
 							}

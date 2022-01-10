@@ -75,7 +75,7 @@ export class Invoices extends DB {
 		this.connection.query(`insert into ${this.table} (id, id_fc, hash, week, site_name, date_order, date_created, client_phone, client_name, client_address, price, status, paid, year, deliver_back, delivery, assembly, entering, assemblyAndEntering, delivery_price, assembly_price, entering_price, assemblyAndEntering_price)
 		values (NULL, ${invoice.id_fc}, "${invoice.hash}",  ${invoice.week}, "${invoice.site_name}", "${invoice.date_order}", "${invoice.date_created}", "${invoice.client_phone}", "${invoice.client_name}", "${invoice.client_address}", ${invoice.price}, "${invoice.status}", 0, ${invoice.year}, ${invoice.deliver_back}, ${invoice.delivery},${invoice.assembly},${invoice.entering}, ${invoice.assemblyAndEntering}, ${invoice.delivery_price},${invoice.assembly_price},${invoice.entering_price}, ${invoice.assemblyAndEntering_price})`, (err: Error, res) => {
 			if(err) console.error(err)
-			else console.log(`[DB][INFO] Insert data to '${this.table}' table successed!`)
+			else console.log(`[DB][INFO] Insert data to '${this.table}' table successed!`, invoice)
 		})
 		return invoice.hash
 	}
@@ -92,7 +92,7 @@ export class InvoicesOrders extends DB {
 		this.connection.query(`insert into ${this.table} (id, id_fc, id_iv, hash, name, count, week, material, color, price, allPrice) 
 		values (NULL, ${invoiceOrder.id_fc}, ${invoiceOrder.id_iv}, "${invoiceOrder.hash}", "${invoiceOrder.name}", ${invoiceOrder.count}, ${invoiceOrder.week}, "${invoiceOrder.material}","${invoiceOrder.color}", ${invoiceOrder.price}, ${invoiceOrder.allPrice})`, (err: Error, res) => {
 			if(err) console.error(err)
-			else console.log(`[DB][INFO] Insert data to '${this.table}' table successed!`)
+			else console.log(`[DB][INFO] Insert data to '${this.table}' table successed!`, invoiceOrder)
 		})
 		return invoiceOrder.hash
 	}

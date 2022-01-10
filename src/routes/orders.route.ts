@@ -26,6 +26,8 @@ export default class ROUTE__Orders{
 	public newOrderCallback = (req: express.Request, res: express.Response) => {
 		// Adding to control
 		
+		console.log(req.body);
+
 		const hashControl = '_' + Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9)
 
 		const data: any = req.body
@@ -40,7 +42,7 @@ export default class ROUTE__Orders{
 			client_name: data.client.name,
 			client_address: data.client.address,
 			date_order: data.additional.dateDelivery,
-			date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+			date_created: String(new Date().toISOString().replace('Z','').replace('T', ' ').substr(0,10)),
 			year: data.additional.year,
 	
 			delivery: Number(data.additional.delivery),
@@ -65,7 +67,7 @@ export default class ROUTE__Orders{
 			client_name: data.client.name,
 			client_address: data.client.address,
 			date_order: data.additional.dateDelivery,
-			date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+			date_created: String(new Date().toISOString().replace('Z','').replace('T', ' ').substr(0,10)),
 			deliver_back: 0,
 			year: data.additional.year,
 	
@@ -91,7 +93,7 @@ export default class ROUTE__Orders{
 				week: data.additional.week,
 				material: order.material,
 				color: order.color,
-				date_created: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDay()}`,
+				date_created: String(new Date().toISOString().replace('Z','').replace('T', ' ').substr(0,10)),
 				id_added_user: 2,
 				year: data.additional.year,
 			})
